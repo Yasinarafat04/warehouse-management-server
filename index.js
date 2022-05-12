@@ -30,6 +30,41 @@ async function run() {
             const products = await cursor.toArray();
             res.send(products);
         });
+
+        // POST product
+        app.post('/product', async (req, res) => {
+            const newproduct = req.body;
+            console.log('adding new user', newproduct);
+            const result = await productCollection.insertOne(newproduct);
+            res.send(result)
+        });
+
+        // update product
+        app.put('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const updatedProduct = req.body;
+            console.log(updatedProduct)
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+
+                    quantity: updatedProduct.quantity
+
+                }
+            };
+            const result = await productCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+
+        })
+
+        // delete a user
+        app.delete('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productCollection.deleteOne(query);
+            res.send(result);
+        })
     }
     finally {
 
